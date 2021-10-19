@@ -10,7 +10,6 @@ except NameError:
     xrange = range  # Python 3
 
 
-
 class TwoLayerNet(object):
     """
     A two-layer fully-connected neural network. The net has an input dimension of
@@ -220,6 +219,11 @@ class TwoLayerNet(object):
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             
             
+            #import random
+            idx_rand=np.random.randint(low=0, high=num_train, size=(batch_size,))
+            X_batch=X[idx_rand]
+            y_batch=y[idx_rand]
+            
             
             pass
         
@@ -238,7 +242,8 @@ class TwoLayerNet(object):
             
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             
-            
+            for param_name in grads:
+                self.params[param_name] = self.params[param_name]-learning_rate*grads[param_name]
             
             pass
         
@@ -288,7 +293,8 @@ class TwoLayerNet(object):
         ###########################################################################
         
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        scores = self.loss(X)
+        y_pred = np.argmax(scores, axis=1)
 
 
         pass
@@ -296,5 +302,3 @@ class TwoLayerNet(object):
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
-
-
