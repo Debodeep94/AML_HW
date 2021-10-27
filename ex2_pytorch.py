@@ -113,17 +113,21 @@ class MultiLayerPerceptron(nn.Module):
         layers = [] #Use the layers list to store a variable number of layers
         
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        
         self.linear1 = torch.nn.Linear(input_size, *hidden_layers)
         self.activation1 = torch.nn.ReLU()
-        self.linear2 = torch.nn.Linear(*hidden_layers, num_classes)
-        layers=nn.ModuleList(modules=[self.linear1,self.activation1,self.linear2])
+        self.linear2 = torch.nn.Linear(*hidden_layers,*hidden_layers)
+        self.activation2 = torch.nn.Tanh()
+        self.norm=torch.nn.BatchNorm1d(*hidden_layers)
+        self.linear3 = torch.nn.Linear(*hidden_layers,num_classes)
         
+        layers=nn.ModuleList(modules=[self.linear1,self.activation1,self.linear2,self.activation2,self.linear3])
         
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         # Enter the layers into nn.Sequential, so the model may "see" them
         # Note the use of * in front of layers
+
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -174,12 +178,14 @@ if train:
             # Use examples in https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
             #################################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        
+            
             immagini=torch.empty((200,32*32*3)).to(device)
             for k in range(len(images)):
-                immagini[k]=images[k]#.flatten()
+                immagini[k]=images[k].flatten()
  
             y_pred=model(immagini)
+            
+           
             loss=criterion(y_pred,labels)
             loss.backward()
             optimizer.step()
@@ -211,13 +217,11 @@ if train:
                 
                 immagini=torch.empty((200,32*32*3)).to(device)
                 for k in range(len(images)):
-                    immagini[k]=images[k]#.flatten()
+                    immagini[k]=images[k].flatten()
                 
                 results=model(immagini)
-                results=torch.sigmoid(results)
-                predicted=torch.max(results)
-                print(predicted)
-                break
+                
+                predicted=torch.argmax(results,1)
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
                 total += labels.size(0)
