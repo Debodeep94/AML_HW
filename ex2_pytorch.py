@@ -25,10 +25,10 @@ print('Using device: %s'%device)
 # Hyper-parameters
 #--------------------------------
 input_size = 32 * 32 * 3
-hidden_size = [700,400,100,100]
+hidden_size = [50]
 num_classes = 10
-num_epochs = 100
-batch_size = 256
+num_epochs = 10
+batch_size = 200
 learning_rate = 1e-3
 learning_rate_decay = 0.95
 reg=0.001
@@ -114,14 +114,13 @@ class MultiLayerPerceptron(nn.Module):
         
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         self.flatten=torch.nn.Flatten()
-        self.linear1 = torch.nn.Linear(input_size, hidden_layers[0])
+        self.linear1 = torch.nn.Linear(input_size, *hidden_layers)
         self.activation1 = torch.nn.ReLU()
-        self.linear2 = torch.nn.Linear(hidden_layers[0],hidden_layers[1])
-        self.batch=torch.nn.BatchNorm1d(hidden_layers[1])
+        self.linear2 = torch.nn.Linear(*hidden_layers,*hidden_layers)
         self.activation2 = torch.nn.ReLU()
-        self.out = torch.nn.Linear(hidden_layers[1],num_classes)
+        self.out = torch.nn.Linear(*hidden_layers,num_classes)
         
-        layers=nn.ModuleList(modules=[self.flatten,self.linear1,self.activation1,self.dropout,self.linear2,self.batch,self.activation2,self.out])
+        layers=nn.ModuleList(modules=[self.flatten,self.linear1,self.activation1,self.linear2,self.activation2,self.out])
         
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
