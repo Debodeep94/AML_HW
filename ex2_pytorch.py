@@ -25,10 +25,10 @@ print('Using device: %s'%device)
 # Hyper-parameters
 #--------------------------------
 input_size = 32 * 32 * 3
-hidden_size = [50]
+hidden_size = [700,400,100,100]
 num_classes = 10
-num_epochs = 10
-batch_size = 200
+num_epochs = 100
+batch_size = 256
 learning_rate = 1e-3
 learning_rate_decay = 0.95
 reg=0.001
@@ -113,15 +113,15 @@ class MultiLayerPerceptron(nn.Module):
         layers = [] #Use the layers list to store a variable number of layers
         
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        
-        self.linear1 = torch.nn.Linear(input_size, *hidden_layers)
+        self.flatten=torch.nn.Flatten()
+        self.linear1 = torch.nn.Linear(input_size, hidden_layers[0])
         self.activation1 = torch.nn.ReLU()
-        self.linear2 = torch.nn.Linear(*hidden_layers,*hidden_layers)
-        self.activation2 = torch.nn.Tanh()
-        self.norm=torch.nn.BatchNorm1d(*hidden_layers)
-        self.linear3 = torch.nn.Linear(*hidden_layers,num_classes)
+        self.linear2 = torch.nn.Linear(hidden_layers[0],hidden_layers[1])
+        self.batch=torch.nn.BatchNorm1d(hidden_layers[1])
+        self.activation2 = torch.nn.ReLU()
+        self.out = torch.nn.Linear(hidden_layers[1],num_classes)
         
-        layers=nn.ModuleList(modules=[self.linear1,self.activation1,self.linear2,self.activation2,self.linear3])
+        layers=nn.ModuleList(modules=[self.flatten,self.linear1,self.activation1,self.dropout,self.linear2,self.batch,self.activation2,self.out])
         
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -179,13 +179,7 @@ if train:
             #################################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             
-            immagini=torch.empty((200,32*32*3)).to(device)
-            for k in range(len(images)):
-                immagini[k]=images[k].flatten()
- 
-            y_pred=model(immagini)
-            
-           
+            y_pred=model(images)
             loss=criterion(y_pred,labels)
             loss.backward()
             optimizer.step()
@@ -212,15 +206,8 @@ if train:
                 # 2. Get the most confident predicted class        #
                 ####################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-
-                
-                immagini=torch.empty((200,32*32*3)).to(device)
-                for k in range(len(images)):
-                    immagini[k]=images[k].flatten()
-                
-                results=model(immagini)
-                
+           
+                results=model(images)
                 predicted=torch.argmax(results,1)
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -272,7 +259,10 @@ else:
             ####################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            
+                
+            results=model(images)
+                
+            predicted=torch.argmax(results,1)
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             total += labels.size(0)
