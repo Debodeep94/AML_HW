@@ -282,43 +282,33 @@ net = TwoLayerNet(input_size, hidden_size, num_classes)
 
 
 stats_check = net.train(X_train, y_train, X_val, y_val,
-            num_iters=10000, batch_size=200,
-            learning_rate=1e-3, learning_rate_decay=0.90,
-            reg=0.25, verbose=True)
+                        num_iters=10000, batch_size=100,
+                        learning_rate=1e-3, learning_rate_decay=0.95,
+                        reg=0.25, verbose=True)
 
-# Predict on the validation set
-val_acc = (net.predict(X_val) == y_val).mean()
-print('Validation accuracy: ', val_acc)
-
-
-# Determining the hidden size:
-acc_box=[]
-hidden_layer_size=list(range(50,1000,50))
+acc_box = []
+hidden_layer_size = list(range(50, 400, 50))
+lrd_list = list(np.arange(0.90, 0.99, 0.01))
 for i in range(len(hidden_layer_size)):
     test_net = TwoLayerNet(input_size, i, num_classes)
     stats_check = test_net.train(X_train, y_train, X_val, y_val,
-            num_iters=10000, batch_size=200,
-            learning_rate=1e-3, learning_rate_decay=.95,
-            reg=0.25, verbose=True)
-    
+                                 num_iters=10000, batch_size=100,
+                                 learning_rate=1e-3, learning_rate_decay=.95,
+                                 reg=0.25, verbose=True)
+
     # Predict on the validation set
     val_acc = (test_net.predict(X_val) == y_val).mean()
     acc_box.append(val_acc)
 pass
 
-acc_box
-plt.plot(hidden_layer_size,acc_box)
-plt.grid()
-
-# The best net
-best_net = TwoLayerNet(input_size, 850, num_classes)
-stats_check = best_net.train(X_train, y_train, X_val, y_val,
-            num_iters=35000, batch_size=200,
-            learning_rate=1e-3, learning_rate_decay=0.95,
-            reg=0.25, verbose=True)
-
+test_net = TwoLayerNet(input_size, 350, num_classes)
+stats_check = test_net.train(X_train, y_train, X_val, y_val,
+                             num_iters=30000, batch_size=100,
+                             learning_rate=1e-3, learning_rate_decay=0.92,
+                             reg=0.25, verbose=True)
 # Predict on the validation set
-val_acc = (best_net.predict(X_val) == y_val).mean()
+
+val_acc = (test_net.predict(X_val) == y_val).mean()
 val_acc
 
 # Plot the loss function and train / validation accuracies
@@ -337,19 +327,20 @@ plt.title('Classification accuracy history')
 plt.xlabel('Epoch')
 plt.ylabel('Classification accuracy')
 plt.legend()
-plt.show()
-
-# *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-# visualize the weights of the best network
+plt.show()# visualize the weights of the best network
 plt.figure(6)
-show_net_weights(best_net)
-
+show_net_weights(test_net)
 
 # Run on the test set
 # When you are done experimenting, you should evaluate your final trained
 # network on the test set; you should get above 48%.
 
-test_acc = (best_net.predict(X_test) == y_test).mean()
+test_acc = (test_net.predict(X_test) == y_test).mean()
 print('Test accuracy: ', test_acc)
+
+
+
+
+
+
 
